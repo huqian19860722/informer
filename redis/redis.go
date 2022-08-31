@@ -2,16 +2,27 @@ package redis
 
 import (
 	"context"
-	"informer/utils"
 
 	redis "github.com/go-redis/redis/v8"
 )
+
+//create redis client
+func NewClient(addr, password string, db int) *redis.Client {
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     addr,
+		Password: password,
+		DB:       db,
+	})
+
+	return rdb
+}
 
 type RedisManager struct {
 	cache *redis.Client
 }
 
-func NewRedisManager(cache *redis.Client) *RedisManager {
+func NewRedisManager(addr, password string, db int) *RedisManager {
+	var cache *redis.Client = NewClient(addr, password, db)
 	return &RedisManager{
 		cache: cache,
 	}
@@ -93,21 +104,21 @@ func (r *RedisManager) SRem(key string, members ...interface{}) int64 {
 }
 
 func TestHMset() {
-	client := utils.NewClient("localhost:6379", "mima", 0)
-	redisManager := NewRedisManager(client)
-	//redisManager.HMset("1562588391084695552/pod/data", "namespace/podname", "{ \"firstName\": \"Brett\", \"lastName\":\"McLaughlin\", \"email\": \"brett@newInstance.com\" }")
-	redisManager.HMSet("1562588391084695552/pod", // k8s集群所有pod数据，相当于集合名称
-		"namespace1/podname1", "json string111....") //以namespace/podname为field value为json串
-	//"namespace2/podname2", "json string222....", // 相当于集合元素，元素即为key-value键值对
-	//"namespace3/podname3", "json string333....")
-	//HMGET 1562588391084695552/pod namespace1/podname1  获取数据 HMGET key field value
+	// client := NewClient("localhost:6379", "mima", 0)
+	// redisManager := NewRedisManager(client)
+	// //redisManager.HMset("1562588391084695552/pod/data", "namespace/podname", "{ \"firstName\": \"Brett\", \"lastName\":\"McLaughlin\", \"email\": \"brett@newInstance.com\" }")
+	// redisManager.HMSet("1562588391084695552/pod", // k8s集群所有pod数据，相当于集合名称
+	// 	"namespace1/podname1", "json string111....") //以namespace/podname为field value为json串
+	// //"namespace2/podname2", "json string222....", // 相当于集合元素，元素即为key-value键值对
+	// //"namespace3/podname3", "json string333....")
+	// //HMGET 1562588391084695552/pod namespace1/podname1  获取数据 HMGET key field value
 }
 
 func TestSAdd() {
-	client := utils.NewClient("localhost:6379", "mima", 0)
-	redisManager := NewRedisManager(client)
-	//redisManager.HMset("1562588391084695552/pod/data", "namespace/podname", "{ \"firstName\": \"Brett\", \"lastName\":\"McLaughlin\", \"email\": \"brett@newInstance.com\" }")
-	redisManager.SAdd("1562588391084695552/pod/index/n1", // 使用namespace做索引，n1即为命名空间名称
-		"pod1", "pod2", "pod3")
-	// smembers 1562588391084695552/pod/index/n1  获取数据
+	// client := NewClient("localhost:6379", "mima", 0)
+	// redisManager := NewRedisManager(client)
+	// //redisManager.HMset("1562588391084695552/pod/data", "namespace/podname", "{ \"firstName\": \"Brett\", \"lastName\":\"McLaughlin\", \"email\": \"brett@newInstance.com\" }")
+	// redisManager.SAdd("1562588391084695552/pod/index/n1", // 使用namespace做索引，n1即为命名空间名称
+	// 	"pod1", "pod2", "pod3")
+	// // smembers 1562588391084695552/pod/index/n1  获取数据
 }
